@@ -1,0 +1,1706 @@
+---
+title: "Влияние бюджетного импульса на потребительский спрос населения РБ"
+author: "Rustem Kamilyanov"
+date: "26 03 2021"
+output:
+  pdf_document: default
+  html_document: default
+---
+## Теоретические аспекты модели (S)VAR.  
+SVAR модель позволяет исследовать отклики системы экономических показателей на неожиданные (шоковые) воздействия, которым подвергаются отдельные переменные системы.  
+
+Рассмотрим простой случай трехмерного VAR(1) процесса:  
+
+\begin{align} 
+y_t = v + A_1y_{t-1} + u_t, \tag{ 1.1 }
+\end{align}  
+
+где $y_t = (y_{1,t}, ..., y_{K,t})'$ - случайный вектор размерности $(K \times 1)$,  
+$A_i$ - фиксированная матрица коэффициентов размерности $(K \times K)$,  
+$v = (v_1, ..., v_K)'$ - фиксированный вектор констант, размерности $(K \times 1)$,  
+$u_t$ - процесс *белого шума* или *инноваций*, размерности $K \times 1$, причем $E(u_t) = 0, E(u_tu_t') = \sum_u$ и $E(u_tu_s') = 0$ для $s \neq t$.  
+
+Процесс (1.1) имеет следующее представление скользящего среднего (MA) при выполнении условия стабильности^[Процесс VAR(1) является стабильным, если все собственные значения $A_1$ меньше единицы по модулю. Это эквивалентно условию $det(I_K - A_1z) \neq 0$ для $|z| \le 1.$]:  
+
+\begin{align} 
+y_t = \mu + \sum_i^{\infty} \Phi_i u_{t-i}, \; t = 0, \pm1, \pm2, ...,  \tag{ 1.2 }
+\end{align}  
+
+где $\mu = (I_K - A_1)^{-1}v, \; \Phi_i = A_1^i$.  
+
+Предположим, что нас интересует влияние инновации в какой-то из переменных. Чтобы изолировать такое влияние, предположим, что все переменные равны своему среднему значению до момента времени $t = 0$, т.е. $y_t = \mu$ для $t < 0$, а какая то из переменных ($i$-я переменная) увеличивается на единичку в момент времени $t = 0$, то есть $u_{i, 0} = 1$. Мы можем проследить, что происходит с системой в течение периодов $t = 1, 2, ...,$, при условии что больше не происходит никаких шоков в других переменных. Для удобства, предположим, что все переменные имеют нулевое среднее, т.е. $v = 0$ в (1.1). Рассмотрим следующий простой пример трехмерной системы:  
+
+\begin{align} 
+
+\begin{bmatrix} y_{1,t} \\ y_{2,t} \\ y_{3,t} \end{bmatrix} = 
+\begin{bmatrix} 0.5 & 0 & 0 \\ 0.1 & 0.1 & 0.3 \\ 0 & 0.2 & 0.3 \end{bmatrix} \tag{ 1.3 }
+\begin{bmatrix} y_{1, t-1} \\ y_{2, t-1} \\ y_{3, t-1} \end{bmatrix} +
+\begin{bmatrix} u_{1,t} \\ u_{2,t} \\ u_{3,t} \end{bmatrix}
+
+\end{align}  
+
+Пусть в первой переменной в период $t = 0$ происходит единичный шок. Тогда можно получить, что  
+
+$$\begin{aligned}
+y_0 &= \begin{bmatrix} y_{1,0} \\ y_{2,0} \\ y_{3,0} \end{bmatrix} = 
+\begin{bmatrix} u_{1,0} \\ u_{2,0} \\ u_{3,0} \end{bmatrix} =
+\begin{bmatrix} 1 \\ 0 \\ 0 \end{bmatrix}, \\
+y_1 &= \begin{bmatrix} y_{1,1} \\ y_{2,1} \\ y_{3,1} \end{bmatrix} =
+A_1y_0 = \begin{bmatrix} 0.5 \\ 0.1 \\ 0 \end{bmatrix}, \\
+y_2 &= \begin{bmatrix} y_{1,2} \\ y_{2,2} \\ y_{3,2} \end{bmatrix} = 
+A_1y_1 =
+A_1^2y_0=
+\begin{bmatrix} 0.25 \\ 0.06 \\ 0.02 \end{bmatrix}.
+\end{aligned}$$  
+
+Продолжая эту процедуру, оказывается, что $y_i = (y_{1,i}, y_{2,i}, y_{3,i})'$ является первым столбцом матрицы $A_1^i$. Аналогично можно показать, что единичный шок во второй (третьей) переменной в $t = 0$ после $i$ периодов приводит к вектору $y_i$, который является вторым (третьим) столбцом матрицы $A_1^i$. Таким образом, элементы $A_1^i$ представляют эффект единичных шоков в переменных системы после $i$ периодов. Следовательно, они называются импульсными откликами, или динамическими мультипликаторами. Так же отметим, что поскольку $A_1^i = \Phi_i$ является $i-й$ матрицей коэффициентов в MA-представлении (1.2) процесса VAR(1), матрицы коэффициентов МА содержат импульсные отклики системы.  
+
+Поскольку $u_t$ является только ошибками прогноза на один шаг вперед для VAR процесса, шоки, рассмотренные здесь, можно интерпретировать как ошибки прогноза.   
+
+Таким образом $\phi_{jk,i}$, $jk$-ый элемент матрицы $\Phi_i$, представляет реакцию $j$-ой переменной системы еа единичный шок в переменной $k$, произошедший $i$ периодов назад.  
+
+Проблематичное предположение в описанном выше виде анализа импульсных откликов заключается в том, что шок происходит только в одно переменной. Такое предположение может быть разумно, если шоки различных переменных некоррелированы, ведь если шоки коррелируют между собой, тогда шок в одной переменной будет сопровождаться шоком в другой переменной. В этом случае, пологая, что все другие остатки равны нулю, можно придти к вводящим в заблюждение выводам.  
+
+Для того, чтобы показать, как уходят от коррелированости остатков вернемся к VAR(1), но с нулевым средним в (1.1):  
+
+\begin{align} 
+y_t = A_1y_{t-1} + u_t, \tag{ 1.4 }
+\end{align}  
+
+Этот процесс может быть переписан так, чтобы остатки в различных уравнениях были некоррелированы. Для этого мы раскладываем ковариационную матрицу белого шума $\sum_u = W \sum_\epsilon W'$, где $\sum_\epsilon$ - диагональная матрица с положительными диагональными элементами, а $W$ - нижнетреугольная матрица с единичной диагональю. Это разложение получено из разложения Холецкого $\sum_u = PP'$, определяя диагональную матрицу $D$ которая имеет ту же самую главную диагональ что и в $\sum_u$, и специфицируя $W = PD'$ и $\sum_\epsilon = DD'.$  
+Умножая слева (1.4)  на $\boldsymbol{\rm{A}} = W^{-1}$, получаем  
+
+\begin{align} 
+\boldsymbol{\rm{A}}y_t = A_1^*y_{t-1} + \epsilon_t, \tag{ 1.5 }
+\end{align}  
+
+где, $A_1^* = \boldsymbol{\rm{A}}A_1$, $i = 1, ..., p$ и $\epsilon_t = (\epsilon_{1,t}, ..., \epsilon_{K,t})' = \boldsymbol{\rm{A}}u_t$ имеет диагональную ковариационную матрицу.  
+
+Добавив $(I_K - \boldsymbol{ \rm{A} })y_t$ к обеим сторонам (1.5) получаем:  
+
+\begin{align} 
+y_t = A_0^*y_t + A_1^*y_{t-1} + \epsilon_t, \tag{ 1.6 }
+\end{align}  
+
+где, $A_0^* = I_K - \boldsymbol{ \rm{A} }.$ Поскольку $W$ является нижнетреугольной матрицей с единичной диагональю, то же самое верно и для \boldsymbol{ \rm{A} }. Следовательно,  
+
+$A_0^* = I_K - \boldsymbol{ \rm{A} } = \begin{bmatrix} 0 & 0 & 0 \\ \beta_{21} & 0 & 0 \\ \beta_{31} & \beta_{32} & 0 \end{bmatrix}$  
+
+является нижнетреугольной матрицей с нулевой диагональю, и, таким образом, в представлении (1.6) нашего VAR(1)- процесса первое уравнение не содержит текущих $y$-ов с правой стороны:  
+
+\begin{aligned}
+\begin{align}
+y_{1,t} &= a_{11}y_{1, t-1} + a_{12}y_{2,t-1} + a_{13}y_{3, t-1} + \epsilon_{1,t}, \\
+y_{2,t} &= \beta_{21}y_{1,t} + a_{21}y_{1,t-1} + a_{22}y_{2, t-1} + a_{23}y_{3, t-1} + \epsilon_{2,t},\tag{1.7} \\
+y_{3,t} &= \beta_{31}y_{1,t} + \beta_{32}y_{2,t} + a_{31}y_{1, t-1} + a_{32}y_{2,t-1} + a_{33}y_{3, t-1} +     \epsilon_{3,t}
+\end{align}
+\end{aligned}  
+
+Такая система называется рекурсивной моделью. В них важен порядок в котором расположены изучаемы переменные.  
+
+Результат выше можно обобщить на случай процесса векторной авторегрессии больших порядков, но мы сейас не будем углубляться в это. Я думаю, что для общего понимания того, что такое импульсные отклики этого достаточно.  
+
+## Описание данных
+
+```{r, message=F, eval=F}
+library(urca)
+library(ggplot2)
+library(vars)
+
+options(scipen = 999)
+
+setwd("/home/rustem/Документы/research/budget_pulse/processed_data")
+load("deficit_surplus.RData")
+load("df_expenses.RData")
+load("df_revenue.RData")
+load("expenses.RData")
+load("k_n.RData")
+load("retail_services.RData")
+
+# убираем первое нулевое значение
+expenses$hau_compar <- expenses$hau_compar[-1, ]
+expenses$national_security_compar <- expenses$national_security_compar[-1, ]
+expenses$national_defense_compar <- expenses$national_defense_compar[-1, ]
+expenses$national_economy_compar <- expenses$national_economy_compar[-1, ]
+expenses$education_compar <- expenses$education_compar[-1, ]
+expenses$national_issues_compar <- expenses$national_issues_compar[-1, ]
+expenses$environmental_protection_compar <- expenses$environmental_protection_compar[-1, ]
+expenses$social_policy_compar <- expenses$social_policy_compar[-1, ]
+expenses$health_care_compar <- expenses$health_care_compar[-1, ]
+expenses$culture_cinema_compar <-expenses$culture_cinema_compar[-1, ]
+expenses$municipal_debt_compar <- expenses$municipal_debt_compar[-1, ]
+expenses$mass_media_compar <- expenses$mass_media_compar[-1, ]
+expenses$sport_compar <- expenses$sport_compar[-1, ]
+
+retail_services$trade_compar <- retail_services$trade_compar[-1, ]
+retail_services$services_compar <- retail_services$services_compar[-1, ]
+
+# Удаляем НЕ приведенные переменные
+expenses <- expenses[15:28]
+
+# Присваиваем оставшимся нулевым и отрицательным значениям значение 0.0000001
+for(i in 1:14){
+  expenses[[i]][[1]][expenses[[i]][[1]] == 0] <- 0.00000000000001
+  expenses[[i]][[1]][expenses[[i]][[1]] < 0] <- 0.00000000000001
+}
+
+
+# Логорифмируем
+for(i in 1:14){
+  expenses[[i]][[1]] <- log(expenses[[i]][[1]])
+}
+
+for(i in 1:4){
+  retail_services[[i]][[1]] <- log(retail_services[[i]][[1]])
+}
+
+setwd("/home/rustem/Документы/research/budget_pulse")
+```
+
+Данная работа посвящена оценке влияния шоков статей расходной части консолидированного бюджета Республики Башкортостан на динамику потребительского спроса населения. Характеризующими динамику потребительского спроса выбраны следующие переменные: Объем платных услуг населению и Оборот розничной торговли в Республике Башкортостан.
+
+Основным инструментом, который использован в работе является модель структурной векторной авторегрессии. С помощью краткосрочных ограничений мы идентифицируем шоки по всем статьям консолидированного бюджета республики.
+
+В результате было обнаружено, что единичные шоки переменных "Расходы на национальную экономику" и "Расходы на жилищно-коммунальное хозяйство" оказывают отложенное положительное воздействие на покупательский спрос населения.   
+
+В данной работе мы используем логорифмированные ежемесячные данные для таких переменных, как:  
+1) Оборот розничной торговли, млн.руб. (tr)  
+2) Объем платных услуг населению, млн.руб. (srv)  
+3) Жилищно-коммунальное хозяйство, млн.руб. (hau)  
+4) Национальная безопасность и правоохранительная деятельность, млн.руб. (sec)  
+5) Национальная оборона, млн.руб. (def)  
+6) Национальная экономика, млн.руб. (econ)  
+7) Образование, млн.руб. (educ)  
+8) Общегосударственные вопросы, млн.руб. (issue)  
+9) Охрана окружающей среды, млн.руб (env)  
+10) Социальная политика, млн.руб. (soc)  
+11) Здравоохранение, млн.руб. (care)  
+12) Культура, кинематография, млн.руб. (cult)  
+13) Обслуживание государственного и муниципального долга, млн.руб. (debt)  
+14) Средства массовой информации, млн.руб. (media)  
+15) Физическая культура и спорт, млн.руб. (sport)  
+
+Исходные данные, взятые с сайтов Министерства финансов РБ и Росстата, были представлены в текущих ценах. Анализ динамических показателей в текущих ценах не является корректным, по этой причине все показатели приведены в сопоставимый вид (к показателям 2020 года). Пересчет к сопоставимому виду осуществлялся по методу А.А. Френкеля.
+
+$$D_s = D_d * k_n$$
+где $D_s$ - сопоставимые показатели, $D_d$ - текущие показатели, $k_n$ - коэффициент для пересчета показателей из текущих показателей в сопоставимые. В качестве коэффициента $k_n$ Френкель предлагает использовать агрегированный индекс инфляции, включающий количественные показатели, отражающие спросовую составляющую в сфере потребления (индекс потребительских цен на товары и услуги) и спросовую составляющую в сфере производства (индекс цен предприятий-производителей на промышленную продукцию, индекс цен в капитальном строительстве, индекс цен в промышленности на приобретенные ресурсы, а также индекс цен на грузовые перевозки), но и индекс роста неплатежей в экономике за соответствующий период как характеристику затратной составляющей инфляции, взятые с соответствующими весами, рассчитанными по коэффициентам парной корреляции. Поскольку при определении структуры сложной системы целесообразнее применять не коэффициент корреляции, а его квадрат, называемый коэффициентом детерминации, то веса для индексов, участвующих при выведении агрегированного индекса инфляции, будут рассчитываться по следующей формуле:  
+$$W_j = \frac{ \sum_{j = 1}^n r^2_{ij} }{ \sum_{j = 1}^n  \sum_{i = 1}^n r^2_{ij} }$$
+где $r^2_{ij}$ - коэффициент парной детерминации между $i$-м и $j$-м показателями ($i$,$j$ = 1, 2, ... , $n$).  
+Итоговая формула коэффициента для перевода действующих цен в сопоставимые выглядит следующим образом:  
+$$k_n = \frac{ 0.28 * I_1 + 0.21 * I_2 + 0.04 * I_3 + 0.20 * I_4 + 0.01 * I_5 + 0.25 * I_6 }{ 100 } * k_{n-1}$$
+где $k_n$ - коэффициент перевода действующих цен в сопоставимые, причем $k_1 = 1$;  
+$I_1$ - Индекс цен на продукцию (затраты, услуги) инвестиционного назначения по Республике Башкортостан;  
+$I_2$ - Индекс тарифов на грузовые перевозки по Республике Башкортостан;  
+$I_3$ - Индекс просроченной кредиторской задолженности организаций по Республике Башкортостан;  
+$I_4$ - Индекс потребительских цен на товары и услуги по Республике Башкортостан;  
+$I_5$ - Индекс средних цен производителей промышленных товаров по Приволжскому федеральному округу;  
+$I_6$ - Индекс цен на приобретенные промышленными организациями отдельных видов товаров по Приволжскому федеральному округу;  
+$n$ - номер месяца, который приводим к ценам ноября 2020 года.  
+
+Подобный подход к решению вопросов сопоставимости позволяет получить соизмеримые данные и показатели социально-экономических процессов, а также использовать полученные достоверные результаты анализа в прогнозировании.  
+
+Ввиду ограниченной доступности данных консолидированного Бюджета Республики Башкортостан (на момент написания работы на сайте Минфина РБ были опубликованы данные с 01.01.2011 по 01.10.2020) был проанализирован период с 01.02.2011 по 01.10.2020.  
+
+Графики по всем переменным в сопоставимых ценах приведены в приложениях 1-15.  
+
+Для тестирования рядов на наличие единичных корней применялся расширенный тест Дики-Фуллера (ADF). Основное отличие расширенного теста от обычного заключается в том, что в тестовые регрессии добавляются лаги первых разностей временного ряда (продифференцированные лаги). Необходимость включения лагов первых разностей вызвана тем, что рассматриваемый процесс может быть авторегрессией не первого, а более высокого порядка. Количество лагов включаемых в тестовые регрессии определялось исходя из информационного критерия Акаике, максимальное значение лагов - 12. Результаты тестирования приведены в таблице 1.  
+
+```{r, eval=F}
+# Переменная tr ( тип процесса TS + DS(I(1)) )
+adf_tr <- ur.df(retail_services$trade_compar$retail_trade, 
+                type = "trend", 
+                selectlags = c("AIC"), lags = 12)
+summary(adf_tr)
+
+#__________________________________
+# Убираем тренд
+tr <- data.frame("tr" = retail_services$trade_compar$retail_trade,
+                   "t" = 1:117)
+trend <- lm(data = tr, tr ~ t)
+
+tr_nontrend <- tr$tr - trend$fitted.values
+plot(tr_nontrend, type = "l")
+
+
+# Дифференцируем, смотрим на графики и на тест ADF
+acf(tr_nontrend)
+pacf(tr_nontrend)
+
+dif_tr_nontrend <- diff(tr_nontrend, differences = 1, lag = 1)
+plot(dif_tr_nontrend, type = "l")
+
+adf_dif_tr_nontrend <- ur.df(dif_tr_nontrend, lags = 12, type = "none")
+summary(adf_dif_tr_nontrend)
+
+# Итоговая
+dif_tr_nontrend
+```
+
+```{r, eval=F}
+# Переменная srv ( тип процесса TS + DS(I(1)) )
+adf_srv <- ur.df(retail_services$services_compar$paid_services, 
+                 type = "drift", 
+                 selectlags = c("AIC"),
+                 lags = 12)
+summary(adf_srv)
+
+#_______________________________
+# Убираем тренд
+srv <- data.frame("srv" = retail_services$services_compar$paid_services,
+                  "t" = 1:117)
+trend <- lm(data = srv, srv ~ t)
+
+srv_nontrend <- srv$srv - trend$fitted.values
+plot(srv_nontrend, type = "l")
+
+# Дифферернцируем
+dif_srv_nontrend <- diff(srv_nontrend, differences = 1, lag = 1)
+plot(dif_srv_nontrend, type = "l")
+
+adf_dif_srv_nontrend <- ur.df(dif_srv_nontrend, 
+                              type = "none", 
+                              selectlags = c("AIC"), 
+                              lags = 12)
+summary(adf_dif_srv_nontrend)
+
+
+# Итоговая
+dif_srv_nontrend
+```
+
+```{r, eval=F}
+# Переменная hau (тип процесса DS(I(1)) )
+adf_hau <- ur.df(expenses$hau_compar$c_3, 
+                 type = "drift", 
+                 selectlags = c("AIC"),
+                 lags = 12)
+summary(adf_hau)
+
+#___________________________________
+# Дифференцируем
+hau <- expenses$hau_compar$c_3
+
+dif_hau <- diff(hau, differences = 1, lag = 1)
+plot(dif_hau, type = "l")
+
+adf_dif_hau <- ur.df(dif_hau,
+                     type = "none",
+                     selectlags = c("AIC"),
+                     lags = 12)
+summary(adf_dif_hau)
+# Итоговая
+dif_hau
+
+```
+
+```{r, eval=F}
+# Переменная sec (тип процесса DS(I(1)) )
+adf_sec <- ur.df(expenses$national_security_compar$c_3, 
+                 type = "none", 
+                 selectlags = c("AIC"),
+                 lags = 12)
+summary(adf_sec)
+
+#______________________________
+# Дифференцируем
+sec <- expenses$national_security_compar$c_3
+
+dif_sec <- diff(sec, differences = 1, lag = 1)
+plot(dif_sec, type = "l")
+
+adf_dif_sec <- ur.df(dif_sec,
+                     type = "none",
+                     selectlags = c("AIC"),
+                     lags = 12)
+summary(adf_dif_sec)
+
+# Итоговая
+dif_sec
+```
+
+```{r, eval=F}
+# Переменная def
+adf_def <- ur.df(expenses$national_defense_compar$c_3, 
+                 type = "drift", 
+                 selectlags = c("AIC"),
+                 lags = 12)
+summary(adf_def)
+
+# Дифференцируем
+def <- expenses$national_defense_compar$c_3
+
+dif_def <- diff(def, differences = 1, lag = 1)
+plot(dif_def, type = "l")
+
+adf_dif_def <- ur.df(dif_def,
+                     type = "none",
+                     selectlags = c("AIC"),
+                     lags = 12)
+summary(adf_dif_def)
+
+# Итоговая
+dif_def
+
+```
+
+```{r, eval=F}
+# Переменная econ
+adf_econ <- ur.df(expenses$national_economy_compar$c_3, 
+                 type = "drift", 
+                 selectlags = c("AIC"),
+                 lags = 12)
+summary(adf_econ)
+
+# Дифференцируем
+econ <- expenses$national_economy_compar$c_3
+
+dif_econ <- diff(econ, differences = 1, lag = 1)
+plot(dif_econ, type = "l")
+
+adf_dif_econ <- ur.df(dif_econ,
+                     type = "drift",
+                     selectlags = c("AIC"),
+                     lags = 12)
+summary(adf_dif_econ)
+
+# Итоговая
+dif_econ
+```
+
+```{r, eval=F}
+# Переменная educ
+adf_educ <- ur.df(expenses$education_compar$c_3, 
+                 type = "none", 
+                 selectlags = c("AIC"),
+                 lags = 12)
+summary(adf_educ)
+
+# Дифференцируем
+educ <- expenses$education_compar$c_3
+
+dif_educ <- diff(educ, differences = 1, lag = 1)
+plot(dif_educ, type = "l")
+
+adf_dif_educ <- ur.df(dif_educ,
+                     type = "none",
+                     selectlags = c("AIC"),
+                     lags = 12)
+summary(adf_dif_educ)
+
+# Итоговая
+dif_educ
+
+```
+
+```{r, eval=F}
+# Переменная issue
+adf_issue <- ur.df(expenses$national_issues_compar$c_3, 
+                 type = "none", 
+                 selectlags = c("AIC"),
+                 lags = 12)
+summary(adf_issue)
+
+# Дифференцируем
+issue <- expenses$national_issues_compar$c_3
+
+dif_issue <- diff(issue, differences = 1, lag = 1)
+plot(dif_issue, type = "l")
+
+adf_dif_issue <- ur.df(dif_issue,
+                     type = "none",
+                     selectlags = c("AIC"),
+                     lags = 12)
+summary(adf_dif_issue)
+
+# Итоговая
+dif_issue
+```
+
+```{r, eval=F}
+# Переменная env
+adf_env <- ur.df(expenses$environmental_protection_compar$c_3, 
+                 type = "none", 
+                 selectlags = c("AIC"),
+                 lags = 12)
+summary(adf_env)
+
+# Дифференцируем
+env <- expenses$environmental_protection_compar$c_3
+
+dif_env <- diff(env, differences = 1, lag = 1)
+plot(dif_env, type = "l")
+
+adf_dif_env <- ur.df(dif_env,
+                     type = "none",
+                     selectlags = c("AIC"),
+                     lags = 12)
+summary(adf_dif_env)
+
+# Итоговая
+dif_env
+
+```
+
+```{r, eval=F}
+# Переменная soc
+adf_soc <- ur.df(expenses$social_policy_compar$c_3, 
+                 type = "trend", 
+                 selectlags = c("AIC"),
+                 lags = 4)
+summary(adf_soc)
+
+# Дифференцируем
+soc <- expenses$social_policy_compar$c_3
+
+dif_soc <- diff(soc, differences = 1, lag = 1)
+plot(dif_soc, type = "l")
+
+adf_dif_soc <- ur.df(dif_soc,
+                     type = "none",
+                     selectlags = c("AIC"),
+                     lags = 12)
+summary(adf_dif_env)
+
+# Итоговая
+dif_soc
+```
+
+```{r, eval=F}
+# Переменная care
+adf_care <- ur.df(expenses$health_care_compar$c_3, 
+                 type = "none", 
+                 selectlags = c("AIC"),
+                 lags = 12)
+summary(adf_care)
+
+# Дифференцируем
+care <- expenses$health_care_compar$c_3
+
+dif_care <- diff(care, differences = 1, lag = 1)
+plot(dif_care, type = "l")
+
+adf_dif_care <- ur.df(dif_care,
+                     type = "none",
+                     selectlags = c("AIC"),
+                     lags = 12)
+summary(adf_dif_care)
+
+# Итоговая
+dif_care
+
+```
+
+```{r, eval=F}
+# Переменная cult
+adf_cult <- ur.df(expenses$culture_cinema_compar$c_3, 
+                 type = "none", 
+                 selectlags = c("AIC"),
+                 lags = 12)
+summary(adf_cult)
+
+# Дифференцируем
+cult <- expenses$culture_cinema_compar$c_3
+
+dif_cult <- diff(cult, differences = 1, lag = 1)
+plot(dif_cult, type = "l")
+
+adf_dif_cult <- ur.df(dif_cult,
+                     type = "none",
+                     selectlags = c("AIC"),
+                     lags = 12)
+summary(adf_dif_cult)
+
+# Итоговая
+dif_cult
+
+```
+
+```{r, eval=F}
+# Переменная debt
+adf_debt <- ur.df(expenses$municipal_debt_compar$c_3, 
+                 type = "none", 
+                 selectlags = c("AIC"),
+                 lags = 12)
+summary(adf_debt)
+
+# Дифференцируем
+debt <- expenses$municipal_debt_compar$c_3
+
+dif_debt <- diff(debt, differences = 2, lag = 1)
+plot(dif_debt, type = "l")
+
+adf_dif_debt <- ur.df(dif_debt,
+                     type = "none",
+                     selectlags = c("AIC"),
+                     lags = 12)
+summary(adf_dif_debt)
+
+# Итоговая
+dif_debt
+```
+
+```{r, eval=F}
+# Переменная media
+adf_media <- ur.df(expenses$mass_media_compar$c_3, 
+                 type = "none", 
+                 selectlags = c("AIC"),
+                 lags = 12)
+summary(adf_media)
+
+# Дифференцируем
+media <- expenses$mass_media_compar$c_3
+
+dif_media <- diff(media, differences = 1, lag = 1)
+plot(dif_media, type = "l")
+
+adf_dif_media <- ur.df(dif_media,
+                     type = "none",
+                     selectlags = c("AIC"),
+                     lags = 12)
+summary(adf_dif_media)
+
+# Итоговая
+dif_media
+```
+
+```{r, eval=F}
+# Переменная sport
+adf_sport <- ur.df(expenses$sport_compar$c_3, 
+                 type = "none", 
+                 selectlags = c("AIC"),
+                 lags = 12)
+summary(adf_sport)
+
+# Дифференцируем
+sport <- expenses$sport_compar$c_3
+
+dif_sport <- diff(sport, differences = 1, lag = 1)
+plot(dif_sport, type = "l")
+
+adf_dif_sport <- ur.df(dif_sport,
+                     type = "none",
+                     selectlags = c("AIC"),
+                     lags = 12)
+summary(adf_dif_sport)
+
+# Итоговая
+dif_sport
+```
+ 
+```{r, eval=F}
+df <- data.frame("Переменная" = rep(NA, 15),
+                 "diff_lag" = rep(NA, 15),
+                 "test" = rep(NA, 15),
+                 "critical" = rep(NA, 15))
+df$Переменная[1] <- "tr"
+df$Переменная[2] <- "srv"
+df$Переменная[3] <- "hau"
+df$Переменная[4] <- "sec"
+df$Переменная[5] <- "def"
+df$Переменная[6] <- "econ"
+df$Переменная[7] <- "educ"
+df$Переменная[8] <- "issue"
+df$Переменная[9] <- "env"
+df$Переменная[10] <- "soc"
+df$Переменная[11] <- "care"
+df$Переменная[12] <- "cult"
+df$Переменная[13] <- "debt"
+df$Переменная[14] <- "media"
+df$Переменная[15] <- "sport"
+
+df$diff_lag[1] <- 9
+df$diff_lag[2] <- 4
+df$diff_lag[3] <- 11
+df$diff_lag[4] <- 10
+df$diff_lag[5] <- 2
+df$diff_lag[6] <- 11
+df$diff_lag[7] <- 11
+df$diff_lag[8] <- 11
+df$diff_lag[9] <- 12
+df$diff_lag[10] <- 3
+df$diff_lag[11] <- 6
+df$diff_lag[12] <- 11
+df$diff_lag[13] <- 8
+df$diff_lag[14] <- 11
+df$diff_lag[15] <- 11
+
+df$test[1] <- -1.6282
+df$test[2] <- -2.1141
+df$test[3] <- -0.435
+df$test[4] <- -0.8132
+df$test[5] <- -3.019
+df$test[6] <- -1.0468
+df$test[7] <- 2.5222
+df$test[8] <- 2.2486
+df$test[9] <- 1.3206
+df$test[10] <- -2.8833
+df$test[11] <- 0.007
+df$test[12] <- 1.9926
+df$test[13] <- 0.0965
+df$test[14] <- -0.316
+df$test[15] <- 1.5217
+
+df$critical[1] <- -3.99
+df$critical[2] <- -3.46
+df$critical[3] <- -3.46
+df$critical[4] <- -2.58
+df$critical[5] <- -3.46
+df$critical[6] <- -3.46
+df$critical[7] <- -2.58
+df$critical[8] <- -2.58
+df$critical[9] <- -2.58
+df$critical[10] <- -3.99
+df$critical[11] <- -2.58
+df$critical[12] <- -2.58
+df$critical[13] <- -2.58
+df$critical[14] <- -2.58
+df$critical[15] <- -2.58
+```
+
+```{r, eval=F}
+# переводим данные в тип ts
+tr <- ts(dif_tr_nontrend, start = c(2011, 02, 01), frequency = 12)
+srv <- ts(dif_srv_nontrend, start = c(2011, 02, 01), frequency = 12)
+hau <- ts(dif_hau, start = c(2011, 02, 01), frequency = 12)
+sec <- ts(dif_sec, start = c(2011, 02, 01), frequency = 12)
+def <- ts(dif_def, start = c(2011, 02, 01), frequency = 12)
+econ <- ts(dif_econ, start = c(2011, 02, 01), frequency = 12)
+educ <- ts(dif_educ, start = c(2011, 02, 01), frequency = 12)
+issue <- ts(dif_issue, start = c(2011, 02, 01), frequency = 12)
+env <- ts(dif_env, start = c(2011, 02, 01), frequency = 12)
+soc <- ts(dif_soc, start = c(2011, 02, 01), frequency = 12)
+care <- ts(dif_care, start = c(2011, 02, 01), frequency = 12)
+cult <- ts(dif_cult, start = c(2011, 02, 01), frequency = 12)
+debt <- ts(dif_debt, start = c(2011, 03, 01), frequency = 12)
+media <- ts(dif_media, start = c(2011, 02, 01), frequency = 12)
+sport <- ts(dif_sport, start = c(2011, 02, 01), frequency = 12)
+
+```
+
+Таблица 1  
+```{r, include=T}
+library(knitr)
+kable(df, format = "markdown", align = "c",
+      caption = "ADF - левосторонний тест, критические значения соответствуют уровню значимости 1%.")
+
+
+```
+Из результатов тестирования, представленных в таблице 1, мы видим, что ни для одного из рядов тест ADF не  отвергает наличие единичного корня на уровне значимости 0,01.  
+
+
+## Описание и оценивание моделей  
+
+Все переменнные взяты в первых разностях. Общая спецификация модели выглядит следующим образом:  
+
+$$\begin{bmatrix} \Delta expenses_t \\ \Delta tr_t \\ \Delta srv_t \end{bmatrix} = 
+C + \sum_{i=1}^p A_i\begin{bmatrix} \Delta expenses_{t-i} \\ \Delta tr_{t-i} \\ \Delta srv_{t-i} \end{bmatrix}
++ B * exog_t +
+\epsilon_t,$$  
+где  
+$\Delta expenses_t$ - одна из статей расходов Бюджета РБ,  
+$\Delta tr_t$ - оборот розничной торговли,  
+$\Delta srv_t$ - объем платных услуг населению,  
+$С$ - вектор столбец оцененных параметров коэффициентов-констант,  
+$A_i$ - матрица оцененных коэффициентов при эндогенных переменных,  
+$B$ - вектор столбец оцененых коэффициентов при экзогенной переменной,  
+$exog$ - экзогенная переменная, учитывающая структурные скачки в переменной $tr$,  
+$p$ - количество лагов эндогенных переменных,  
+$\epsilon$ - случайная ошибка (белый шум).  
+
+Количество лагов при оценивании моделей подбиралось на основании информационного критерия Шварца (SC).  
+Далее в работе изучается влияние каждой из расходных статей бюджета РБ на оборот розничной торговли и на объем платных услуг населению. Модели и соответствующие им функции импульсных откликов в которых эффект от единичных шоков не значим, представлены в приложениях.   
+
+```{r, eval=F}
+# экзогенная переменная учитывающая скачки переменной tr
+dum <- rep(0, 116)
+dum[12] <- 1
+dum[24] <- 1
+dum[36] <- 1
+dum[48] <- 1
+dum[60] <- 1
+dum[72] <- 1
+dum[84] <- 1
+dum[96] <- 1
+dum[108] <- 1
+
+dum <- as.data.frame(dum)
+colnames(dum) <- "exog"
+```
+
+
+#### Модель 1
+
+Спецификация модели 1:  
+$$\begin{bmatrix} \Delta hau_t \\ \Delta tr_t \\ \Delta srv_t \end{bmatrix} = 
+C + \sum_{i=1}^p A_i\begin{bmatrix} \Delta hau_{t-i} \\ \Delta tr_{t-i} \\ \Delta srv_{t-i} \end{bmatrix}
++ B * exog_t + \epsilon_t,$$  
+где переменная $hau$ - расходы на жилищно-коммунальное хозяйство,  
+$p$ = 5  
+```{r, eval=F}
+data_1 <- cbind(tr, srv, hau)
+# количество лагов 4
+info_var <- VARselect(y = data_1, lag.max = 15, type = "both")
+info_var$selection
+
+# оцениваем модель
+var_est1 <- VAR(data_1, p = 5, type = "both", season = NULL, exogen = dum)
+summary(var_est1)
+
+# A mat
+a.mat_1 <- diag(3)
+diag(a.mat_1) <- 1
+a.mat_1[2, 1] <- NA
+a.mat_1[3, 1] <- NA
+a.mat_1[3, 2] <- NA
+print(a.mat_1)
+
+# B mat
+#b.mat_1 <- diag(3)
+#diag(b.mat_1) <- NA
+#print(b.mat_1)
+
+
+#SVAR model
+svar_1 <- SVAR(var_est1, 
+              Amat = a.mat_1, 
+              Bmat = NULL)
+svar_1
+```
+
+```{r, eval=F, warning=F}
+irf_11 <- irf(svar_1, response = "tr", impulse = "hau",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+
+irf_21 <- irf(svar_1, response = "srv", impulse = "hau",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+```
+
+```{r, include=T, warning= F, fig.show="hold", out.width="50%"}
+par(mar = c(4, 4, .1, .1))
+plot(irf_11, main = "Единичный шок по статье расходы ЖКХ",
+     ylab = "Величина отклика tr")
+plot(irf_21, main = "Единичный шок по статье расходы ЖКХ",
+     ylab = "Величина отклика srv")
+```
+
+На графиках выше представлены отклики переменных "Оборот розничной торговли" (tr) и "Объем платных услуг населению" (srv) на единичный шок по переменной "Расходы на жилищно-коммунальное хозяйство" (hau). Красными пунктирными линиями изображены 95-процентные доверительные интервалы, а по оси абсцисс расположены временные промежутки (лаги), величина которых равна одному месяцу.  
+На левом графике мы видим, что единичный шок переменной hau (резкое увеличение расходов по данной статьей) оказывает положительный эффект на переменную tr уже на второй месяц. Поскольку нижний доверительный интервал в промежутке 1-4 лаг находится возле нуля, мы не можем быть уверены в том, что эффект от единичного шока существенно отличается от нуля.  
+Ситуация со вторым графиком намного лучше. На нем мы видим, что положительный эффект на переменную srv проявляется спустя четыре месяца после единичного шока переменной hau, при этом доверительные интервалы говорят о том, что данный эффект является значимым. Так же стоит отметить, что объем платных услуг постепенно возвращается на прежний уровень начиная, с восьмого лага, т.е. спустя восемь месяцев после единичного шока.  
+
+#### Модель 4
+
+Спецификация модели 4:  
+$$\begin{bmatrix} \Delta econ_t \\ \Delta tr_t \\ \Delta srv_t \end{bmatrix} = 
+C + \sum_{i=1}^p A_i\begin{bmatrix} \Delta econ_{t-i} \\ \Delta tr_{t-i} \\ \Delta srv_{t-i} \end{bmatrix}
++ B * exog_t + \epsilon_t,$$  
+где переменная $econ$ - расходы на национальную экономику,  
+$p$ = 4  
+```{r, eval=F}
+data_2 <- cbind(tr, srv, econ)
+# количество лагов 2
+info_var <- VARselect(y = data_2, lag.max = 15, type = "both")
+info_var$selection
+
+# оцениваем модель
+var_est2 <- VAR(data_2, p = 4, type = "both", season = NULL, exogen = dum)
+summary(var_est2)
+
+# A mat
+a.mat_2 <- diag(3)
+diag(a.mat_2) <- 1
+a.mat_2[2, 1] <- NA
+a.mat_2[3, 1] <- NA
+a.mat_2[3, 2] <- NA
+print(a.mat_2)
+
+# B mat
+#b.mat_2 <- diag(3)
+#diag(b.mat_2) <- NA
+#print(b.mat_2)
+
+
+#SVAR model
+svar_2 <- SVAR(var_est2, 
+              Amat = a.mat_2, 
+              Bmat = NULL)
+svar_2
+```
+
+```{r, eval=F, warning=F}
+irf_12 <- irf(svar_2, response = "tr", impulse = "econ",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+
+irf_22 <- irf(svar_2, response = "srv", impulse = "econ",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+```
+
+```{r, include=T, warning= F, fig.show="hold", out.width="50%"}
+par(mar = c(4, 4, .1, .1))
+plot(irf_12, main = "Единичный шок по статье расходы на Национальную экономику",
+     ylab = "Величина отклика tr")
+plot(irf_22, main = "Единичный шок по статье расходы на Национальную экономику",
+     ylab = "Величина отклика srv")
+```
+
+Единичный шок переменной "Расходы на национальную экономику" оказывает положительный эффект на переменную tr уже на второй месяц (левый график) и постепенно возвращается в "дошоковое" состояние, начиная с шестого лага.  
+Положительный эффект на переменную srv проявляется на пятый месяц после единичного шока переменной econ и с шестого лага постепенно возвращается на прежний уровень.  
+
+## Приложения
+
+График 1  
+
+```{r, echo=F}
+library(ggplot2)
+ggplot()+
+  geom_line(data = retail_services$trade_compar,
+            aes(x = date, y = retail_trade)) +
+  xlab("") +
+  ylab("") +
+  ggtitle("Оборот розничной торговли, млн.руб.")
+```
+
+График 2  
+
+```{r, echo=F}
+ggplot()+
+  geom_line(data = retail_services$services_compar,
+            aes(x = date, y = paid_services)) +
+  xlab("") +
+  ylab("") +
+  ggtitle("Объем платных услуг населению, млн.руб.")
+```
+
+График 3  
+
+```{r, echo=F}
+ggplot()+
+  geom_line(data = expenses$hau_compar,
+            aes(x = date, y = c_3)) +
+  xlab("") +
+  ylab("") +
+  ggtitle("Расходы на Жилищно-коммунальное хозяйство, млн.руб.")
+```
+
+График 4  
+
+```{r, echo=F}
+ggplot()+
+  geom_line(data = expenses$national_security_compar,
+            aes(x = date, y = c_3)) +
+  xlab("") +
+  ylab("") +
+  ggtitle("Расходы на национальную безопасность и \nправоохранительную деятельность, млн.руб.")
+```
+
+График 5  
+
+```{r, echo=F}
+ggplot()+
+  geom_line(data = expenses$national_defense_compar,
+            aes(x = date, y = c_3)) +
+  xlab("") +
+  ylab("") +
+  ggtitle("Расходы на национальную оборону, млн.руб.")
+```
+
+График 6  
+
+```{r, echo=F}
+ggplot()+
+  geom_line(data = expenses$national_economy_compar,
+            aes(x = date, y = c_3)) +
+  xlab("") +
+  ylab("") +
+  ggtitle("Расходы на национальную экономику, млн.руб.")
+```
+
+График 7  
+
+```{r, echo=F}
+ggplot()+
+  geom_line(data = expenses$education_compar,
+            aes(x = date, y = c_3)) +
+  xlab("") +
+  ylab("") +
+  ggtitle("Расходы на образование, млн.руб.")
+```
+
+График 8  
+
+```{r, echo=F}
+ggplot()+
+  geom_line(data = expenses$national_issues_compar,
+            aes(x = date, y = c_3)) +
+  xlab("") +
+  ylab("") +
+  ggtitle("Расходы на общегосударственные вопросы, млн.руб.")
+```
+
+График 9  
+
+```{r, echo=F}
+ggplot()+
+  geom_line(data = expenses$environmental_protection_compar,
+            aes(x = date, y = c_3)) +
+  xlab("") +
+  ylab("") +
+  ggtitle("Расходы на охрану окружающей среды, млн.руб.")
+```
+
+График 10  
+
+```{r, echo=F}
+ggplot()+
+  geom_line(data = expenses$social_policy_compar,
+            aes(x = date, y = c_3)) +
+  xlab("") +
+  ylab("") +
+  ggtitle("Расходы на социальную политику, млн.руб.")
+```
+
+График 11  
+
+```{r, echo=F}
+ggplot()+
+  geom_line(data = expenses$health_care_compar,
+            aes(x = date, y = c_3)) +
+  xlab("") +
+  ylab("") +
+  ggtitle("Расходы на здравоохранение, млн.руб.")
+```
+
+График 12  
+
+```{r, echo=F}
+ggplot()+
+  geom_line(data = expenses$culture_cinema_compar,
+            aes(x = date, y = c_3)) +
+  xlab("") +
+  ylab("") +
+  ggtitle("Расходы на культуру и кинематографию, млн.руб.")
+```
+
+График 13  
+
+```{r, echo=F}
+ggplot()+
+  geom_line(data = expenses$municipal_debt_compar,
+            aes(x = date, y = c_3)) +
+  xlab("") +
+  ylab("") +
+  ggtitle("Расходы на обслуживание государственного и \nмуниципального долга, млн.руб.")
+```
+
+График 14  
+
+```{r, echo=F}
+ggplot()+
+  geom_line(data = expenses$mass_media_compar,
+            aes(x = date, y = c_3)) +
+  xlab("") +
+  ylab("") +
+  ggtitle("Расходы на средства массовой информации, млн.руб.")
+```
+
+График 15  
+
+```{r, echo=F}
+ggplot()+
+  geom_line(data = expenses$sport_compar,
+            aes(x = date, y = c_3)) +
+  xlab("") +
+  ylab("") +
+  ggtitle("Расходы на физическую культуру и спорт, млн.руб.")
+```
+
+#### Модель 2
+
+Спецификация модели 2:  
+$$\begin{bmatrix} \Delta sec_t \\ \Delta tr_t \\ \Delta srv_t \end{bmatrix} = 
+C + \sum_{i=1}^p A_i\begin{bmatrix} \Delta sec_{t-i} \\ \Delta tr_{t-i} \\ \Delta srv_{t-i} \end{bmatrix}
++ B * exog_t + \epsilon_t,$$  
+где переменная $sec$ - расходы на национальную безопасность и правоохранительную деятельность,  
+$p$ = 2  
+```{r, include = F, echo=F}
+data <- cbind(tr, srv, sec)
+# количество лагов 2
+info_var <- VARselect(y = data, lag.max = 15, type = "both")
+info_var$selection
+
+# оцениваем модель
+var_est1 <- VAR(data, p = 2, type = "both", season = NULL, exogen = dum)
+summary(var_est1)
+
+# A mat
+a.mat <- diag(3)
+diag(a.mat) <- NA
+a.mat[2, 1] <- NA
+a.mat[3, 1] <- NA
+a.mat[3, 2] <- NA
+print(a.mat)
+
+# B mat
+b.mat <- diag(3)
+diag(b.mat) <- NA
+print(b.mat)
+
+
+#SVAR model
+svar_1 <- SVAR(var_est1, 
+              Amat = a.mat, 
+              Bmat = b.mat, 
+              max.iter = 10000, 
+              hessian = TRUE)
+svar_1
+```
+
+```{r, echo=FALSE, warning=F}
+irf_1 <- irf(svar_1, response = "tr", impulse = "sec",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+
+irf_2 <- irf(svar_1, response = "srv", impulse = "sec",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+```
+
+```{r, echo=FALSE, warning= F, fig.show="hold", out.width="50%"}
+par(mar = c(4, 4, .1, .1))
+plot(irf_1, main = "Единичный шок по статье расходы на Нац. безопасность \nи правоохранительная деятельность",
+     ylab = "Величина отклика tr")
+plot(irf_2, main = "Единичный шок по статье расходы на Нац. безопасность \nи правоохранительная деятельность",
+     ylab = "Величина отклика srv")
+```
+Эффект от единичного шока не значим.  
+
+#### Модель 3
+
+Спецификация модели 3:  
+$$\begin{bmatrix} \Delta def_t \\ \Delta tr_t \\ \Delta srv_t \end{bmatrix} = 
+C + \sum_{i=1}^p A_i\begin{bmatrix} \Delta def_{t-i} \\ \Delta tr_{t-i} \\ \Delta srv_{t-i} \end{bmatrix}
++ B * exog_t + \epsilon_t,$$  
+где переменная $def$ - расходы на национальную оборону,  
+$p$ = 1  
+```{r, include = F, echo=F}
+data <- cbind(tr, srv, def)
+# количество лагов 1
+info_var <- VARselect(y = data, lag.max = 15, type = "both")
+info_var$selection
+
+# оцениваем модель
+var_est1 <- VAR(data, p = 1, type = "both", season = NULL, exogen = dum)
+summary(var_est1)
+
+# A mat
+a.mat <- diag(3)
+diag(a.mat) <- NA
+a.mat[2, 1] <- NA
+a.mat[3, 1] <- NA
+a.mat[3, 2] <- NA
+print(a.mat)
+
+# B mat
+b.mat <- diag(3)
+diag(b.mat) <- NA
+print(b.mat)
+
+
+#SVAR model
+svar_1 <- SVAR(var_est1, 
+              Amat = a.mat, 
+              Bmat = b.mat, 
+              max.iter = 10000, 
+              hessian = TRUE)
+svar_1
+```
+
+```{r, echo=FALSE, warning=F}
+irf_1 <- irf(svar_1, response = "tr", impulse = "def",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+
+irf_2 <- irf(svar_1, response = "srv", impulse = "def",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+```
+
+```{r, echo=FALSE, warning= F, fig.show="hold", out.width="50%"}
+par(mar = c(4, 4, .1, .1))
+plot(irf_1, main = "Единичный шок по статье расходы на Национальную оборону",
+     ylab = "Величина отклика tr")
+plot(irf_2, main = "Единичный шок по статье расходы на Национальную оборону",
+     ylab = "Величина отклика srv")
+```
+
+Эффект от единичного шока не значим.
+
+#### Модель 5  
+
+Спецификация модели 5:  
+$$\begin{bmatrix} \Delta educ_t \\ \Delta tr_t \\ \Delta srv_t \end{bmatrix} = 
+C + \sum_{i=1}^p A_i\begin{bmatrix} \Delta educ_{t-i} \\ \Delta tr_{t-i} \\ \Delta srv_{t-i} \end{bmatrix}
++ B * exog_t + \epsilon_t,$$  
+где переменная $educ$ - расходы на образование,  
+$p$ = 6  
+```{r, include = F, echo=F}
+data <- cbind(tr, srv, educ)
+# количество лагов 6
+info_var <- VARselect(y = data, lag.max = 15, type = "both")
+info_var$selection
+
+# оцениваем модель
+var_est1 <- VAR(data, p = 6, type = "both", season = NULL, exogen = dum)
+summary(var_est1)
+
+# A mat
+a.mat <- diag(3)
+diag(a.mat) <- NA
+a.mat[2, 1] <- NA
+a.mat[3, 1] <- NA
+a.mat[3, 2] <- NA
+print(a.mat)
+
+# B mat
+b.mat <- diag(3)
+diag(b.mat) <- NA
+print(b.mat)
+
+
+#SVAR model
+svar_1 <- SVAR(var_est1, 
+              Amat = a.mat, 
+              Bmat = b.mat, 
+              max.iter = 10000, 
+              hessian = TRUE)
+svar_1
+```
+
+```{r, echo=FALSE, warning=F}
+irf_1 <- irf(svar_1, response = "tr", impulse = "educ",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+
+irf_2 <- irf(svar_1, response = "srv", impulse = "educ",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+```
+
+```{r, echo=FALSE, warning= F, fig.show="hold", out.width="50%"}
+par(mar = c(4, 4, .1, .1))
+plot(irf_1, main = "Единичный шок по статье расходы на образование",
+     ylab = "Величина отклика tr")
+plot(irf_2, main = "Единичный шок по статье расходы на образование",
+     ylab = "Величина отклика srv")
+```
+
+Эффект от единичного шока не значим.  
+
+#### Модель 6  
+
+Спецификация модели 6:  
+$$\begin{bmatrix} \Delta issue_t \\ \Delta tr_t \\ \Delta srv_t \end{bmatrix} = 
+C + \sum_{i=1}^p A_i\begin{bmatrix} \Delta issue_{t-i} \\ \Delta tr_{t-i} \\ \Delta srv_{t-i} \end{bmatrix}
++ B * exog_t + \epsilon_t,$$  
+где переменная $issue$ - расходы на общегосударственные вопросы,  
+$p$ = 7  
+```{r, include = F, echo=F}
+data <- cbind(tr, srv, issue)
+# количество лагов 7
+info_var <- VARselect(y = data, lag.max = 15, type = "both")
+info_var$selection
+
+# оцениваем модель
+var_est1 <- VAR(data, p = 7, type = "both", season = NULL, exogen = dum)
+summary(var_est1)
+
+# A mat
+a.mat <- diag(3)
+diag(a.mat) <- NA
+a.mat[2, 1] <- NA
+a.mat[3, 1] <- NA
+a.mat[3, 2] <- NA
+print(a.mat)
+
+# B mat
+b.mat <- diag(3)
+diag(b.mat) <- NA
+print(b.mat)
+
+
+#SVAR model
+svar_1 <- SVAR(var_est1, 
+              Amat = a.mat, 
+              Bmat = b.mat, 
+              max.iter = 10000, 
+              hessian = TRUE)
+svar_1
+```
+
+```{r, echo=FALSE, warning=F}
+irf_1 <- irf(svar_1, response = "tr", impulse = "issue",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+
+irf_2 <- irf(svar_1, response = "srv", impulse = "issue",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+```
+
+```{r, echo=FALSE, warning= F, fig.show="hold", out.width="50%"}
+par(mar = c(4, 4, .1, .1))
+plot(irf_1, main = "Единичный шок по статье расходы на общегосударственные вопросы",
+     ylab = "Величина отклика tr")
+plot(irf_2, main = "Единичный шок по статье расходы на общегосударственные вопросы",
+     ylab = "Величина отклика srv")
+```
+Эффект от единичного шока не значим.
+
+#### Модель 7  
+
+Спецификация модели 7:  
+$$\begin{bmatrix} \Delta env_t \\ \Delta tr_t \\ \Delta srv_t \end{bmatrix} = 
+C + \sum_{i=1}^p A_i\begin{bmatrix} \Delta env_{t-i} \\ \Delta tr_{t-i} \\ \Delta srv_{t-i} \end{bmatrix}
++ B * exog_t + \epsilon_t,$$  
+где переменная $env$ - расходы на общегосударственные вопросы,  
+$p$ = 1  
+```{r, include = F, echo=F}
+data <- cbind(tr, srv, env)
+# количество лагов 1
+info_var <- VARselect(y = data, lag.max = 15, type = "both")
+info_var$selection
+
+# оцениваем модель
+var_est1 <- VAR(data, p = 1, type = "both", season = NULL, exogen = dum)
+summary(var_est1)
+
+# A mat
+a.mat <- diag(3)
+diag(a.mat) <- NA
+a.mat[2, 1] <- NA
+a.mat[3, 1] <- NA
+a.mat[3, 2] <- NA
+print(a.mat)
+
+# B mat
+b.mat <- diag(3)
+diag(b.mat) <- NA
+print(b.mat)
+
+
+#SVAR model
+svar_1 <- SVAR(var_est1, 
+              Amat = a.mat, 
+              Bmat = b.mat, 
+              max.iter = 10000, 
+              hessian = TRUE)
+svar_1
+```
+
+```{r, echo=FALSE, warning=F}
+irf_1 <- irf(svar_1, response = "tr", impulse = "env",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+
+irf_2 <- irf(svar_1, response = "srv", impulse = "env",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+```
+
+```{r, echo=FALSE, warning= F, fig.show="hold", out.width="50%"}
+par(mar = c(4, 4, .1, .1))
+plot(irf_1, main = "Единичный шок по статье расходы на охрану окружающей среды",
+     ylab = "Величина отклика tr")
+plot(irf_2, main = "Единичный шок по статье расходы на охрану окружающей среды",
+     ylab = "Величина отклика srv")
+```
+Эффект от единичного шока не значим.
+
+#### Модель 8  
+
+Спецификация модели 8:  
+$$\begin{bmatrix} \Delta soc_t \\ \Delta tr_t \\ \Delta srv_t \end{bmatrix} = 
+C + \sum_{i=1}^p A_i\begin{bmatrix} \Delta soc_{t-i} \\ \Delta tr_{t-i} \\ \Delta srv_{t-i} \end{bmatrix}
++ B * exog_t + \epsilon_t,$$  
+где переменная $soc$ - расходы на cоциальную политику,  
+$p$ = 1  
+```{r, include = F, echo=F}
+data <- cbind(tr, srv, soc)
+# количество лагов 1
+info_var <- VARselect(y = data, lag.max = 15, type = "both")
+info_var$selection
+
+# оцениваем модель
+var_est1 <- VAR(data, p = 1, type = "both", season = NULL, exogen = dum)
+summary(var_est1)
+
+# A mat
+a.mat <- diag(3)
+diag(a.mat) <- NA
+a.mat[2, 1] <- NA
+a.mat[3, 1] <- NA
+a.mat[3, 2] <- NA
+print(a.mat)
+
+# B mat
+b.mat <- diag(3)
+diag(b.mat) <- NA
+print(b.mat)
+
+
+#SVAR model
+svar_1 <- SVAR(var_est1, 
+              Amat = a.mat, 
+              Bmat = b.mat, 
+              max.iter = 10000, 
+              hessian = TRUE)
+svar_1
+```
+
+```{r, echo=FALSE, warning=F}
+irf_1 <- irf(svar_1, response = "tr", impulse = "soc",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+
+irf_2 <- irf(svar_1, response = "srv", impulse = "soc",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+```
+
+```{r, echo=FALSE, warning= F, fig.show="hold", out.width="50%"}
+par(mar = c(4, 4, .1, .1))
+plot(irf_1, main = "Единичный шок по статье расходы на социальную политику",
+     ylab = "Величина отклика tr")
+plot(irf_2, main = "Единичный шок по статье расходы на социальную политику",
+     ylab = "Величина отклика srv")
+```
+Эффект от единичного шока не значим.
+
+#### Модель 9  
+
+Спецификация модели 9:  
+$$\begin{bmatrix} \Delta care_t \\ \Delta tr_t \\ \Delta srv_t \end{bmatrix} = 
+C + \sum_{i=1}^p A_i\begin{bmatrix} \Delta care_{t-i} \\ \Delta tr_{t-i} \\ \Delta srv_{t-i} \end{bmatrix}
++ B * exog_t + \epsilon_t,$$  
+где переменная $care$ - расходы на здравоохранение,  
+$p$ = 2  
+```{r, include = F, echo=F}
+data <- cbind(tr, srv, care)
+# количество лагов 2
+info_var <- VARselect(y = data, lag.max = 15, type = "both")
+info_var$selection
+
+# оцениваем модель
+var_est1 <- VAR(data, p = 2, type = "both", season = NULL, exogen = dum)
+summary(var_est1)
+
+# A mat
+a.mat <- diag(3)
+diag(a.mat) <- NA
+a.mat[2, 1] <- NA
+a.mat[3, 1] <- NA
+a.mat[3, 2] <- NA
+print(a.mat)
+
+# B mat
+b.mat <- diag(3)
+diag(b.mat) <- NA
+print(b.mat)
+
+
+#SVAR model
+svar_1 <- SVAR(var_est1, 
+              Amat = a.mat, 
+              Bmat = b.mat, 
+              max.iter = 10000, 
+              hessian = TRUE)
+svar_1
+```
+
+```{r, echo=FALSE, warning=F}
+irf_1 <- irf(svar_1, response = "tr", impulse = "care",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+
+irf_2 <- irf(svar_1, response = "srv", impulse = "care",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+```
+
+```{r, echo=FALSE, warning= F, fig.show="hold", out.width="50%"}
+par(mar = c(4, 4, .1, .1))
+plot(irf_1, main = "Единичный шок по статье расходы на здравоохранение",
+     ylab = "Величина отклика tr")
+plot(irf_2, main = "Единичный шок по статье расходы на здравоохранение",
+     ylab = "Величина отклика srv")
+```
+Эффект от единичного шока не значим.
+
+#### Модель 10  
+
+Спецификация модели 10:  
+$$\begin{bmatrix} \Delta cult_t \\ \Delta tr_t \\ \Delta srv_t \end{bmatrix} = 
+C + \sum_{i=1}^p A_i\begin{bmatrix} \Delta cult_{t-i} \\ \Delta tr_{t-i} \\ \Delta srv_{t-i} \end{bmatrix}
++ B * exog_t + \epsilon_t,$$  
+где переменная $cult$ - расходы на культуру и кинематографию,  
+$p$ = 5  
+```{r, include = F, echo=F}
+data <- cbind(tr, srv, cult)
+# количество лагов 5
+info_var <- VARselect(y = data, lag.max = 15, type = "both")
+info_var$selection
+
+# оцениваем модель
+var_est1 <- VAR(data, p = 5, type = "both", season = NULL, exogen = dum)
+summary(var_est1)
+
+# A mat
+a.mat <- diag(3)
+diag(a.mat) <- NA
+a.mat[2, 1] <- NA
+a.mat[3, 1] <- NA
+a.mat[3, 2] <- NA
+print(a.mat)
+
+# B mat
+b.mat <- diag(3)
+diag(b.mat) <- NA
+print(b.mat)
+
+
+#SVAR model
+svar_1 <- SVAR(var_est1, 
+              Amat = a.mat, 
+              Bmat = b.mat, 
+              max.iter = 10000, 
+              hessian = TRUE)
+svar_1
+```
+
+```{r, echo=FALSE, warning=F}
+irf_1 <- irf(svar_1, response = "tr", impulse = "cult",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+
+irf_2 <- irf(svar_1, response = "srv", impulse = "cult",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+```
+
+```{r, echo=FALSE, warning= F, fig.show="hold", out.width="50%"}
+par(mar = c(4, 4, .1, .1))
+plot(irf_1, main = "Единичный шок по статье расходы на культуру и кинематографию",
+     ylab = "Величина отклика tr")
+plot(irf_2, main = "Единичный шок по статье расходы на культуру и кинематографию",
+     ylab = "Величина отклика srv")
+```
+Эффект от единичного шока не значим.
+
+#### Модель 11  
+
+Спецификация модели 11:  
+$$\begin{bmatrix} \Delta debt_t \\ \Delta tr_t \\ \Delta srv_t \end{bmatrix} = 
+C + \sum_{i=1}^p A_i\begin{bmatrix} \Delta debt_{t-i} \\ \Delta tr_{t-i} \\ \Delta srv_{t-i} \end{bmatrix}
++ B * exog_t + \epsilon_t,$$  
+где переменная $debt$ - расходы на обслуживание государственного и муниципального долга,  
+$p$ = 8  
+```{r, include = F, echo=F}
+data <- cbind(tr[2:116], srv[2:116], debt)
+# количество лагов 8
+info_var <- VARselect(y = data, lag.max = 15, type = "both")
+info_var$selection
+
+# оцениваем модель
+var_est1 <- VAR(data, p = 8, type = "both", season = NULL, exogen = dum[2:116, ])
+summary(var_est1)
+
+# A mat
+a.mat <- diag(3)
+diag(a.mat) <- NA
+a.mat[2, 1] <- NA
+a.mat[3, 1] <- NA
+a.mat[3, 2] <- NA
+print(a.mat)
+
+# B mat
+b.mat <- diag(3)
+diag(b.mat) <- NA
+print(b.mat)
+
+
+#SVAR model
+svar_1 <- SVAR(var_est1, 
+              Amat = a.mat, 
+              Bmat = b.mat, 
+              max.iter = 10000, 
+              hessian = TRUE)
+svar_1
+```
+
+```{r, echo=FALSE, warning=F}
+irf_1 <- irf(svar_1, response = "tr.2.116.", impulse = "debt",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+
+irf_2 <- irf(svar_1, response = "srv.2.116.", impulse = "debt",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+```
+
+```{r, echo=FALSE, warning= F, fig.show="hold", out.width="50%"}
+par(mar = c(4, 4, .1, .1))
+plot(irf_1, main = "Единичный шок по статье расходы на обслуживание гос. и муницип. долга",
+     ylab = "Величина отклика tr")
+plot(irf_2, main = "Единичный шок по статье расходы на обслуживание гос. и муницип. долга",
+     ylab = "Величина отклика srv")
+```
+Эффект от единичного шока не значим.
+
+#### Модель 12  
+
+Спецификация модели 12:  
+$$\begin{bmatrix} \Delta media_t \\ \Delta tr_t \\ \Delta srv_t \end{bmatrix} = 
+C + \sum_{i=1}^p A_i\begin{bmatrix} \Delta media_{t-i} \\ \Delta tr_{t-i} \\ \Delta srv_{t-i} \end{bmatrix}
++ B * exog_t + \epsilon_t,$$  
+где переменная $media$ - расходы на средства массовой информации,  
+$p$ = 5  
+```{r, include = F, echo=F}
+data <- cbind(tr, srv, media)
+# количество лагов 1
+info_var <- VARselect(y = data, lag.max = 15, type = "both")
+info_var$selection
+
+# оцениваем модель
+var_est1 <- VAR(data, p = 5, type = "both", season = NULL, exogen = dum)
+summary(var_est1)
+
+# A mat
+a.mat <- diag(3)
+diag(a.mat) <- NA
+a.mat[2, 1] <- NA
+a.mat[3, 1] <- NA
+a.mat[3, 2] <- NA
+print(a.mat)
+
+# B mat
+b.mat <- diag(3)
+diag(b.mat) <- NA
+print(b.mat)
+
+
+#SVAR model
+svar_1 <- SVAR(var_est1, 
+              Amat = a.mat, 
+              Bmat = b.mat, 
+              max.iter = 10000, 
+              hessian = TRUE)
+svar_1
+```
+
+```{r, echo=FALSE, warning=F}
+irf_1 <- irf(svar_1, response = "tr", impulse = "media",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+
+irf_2 <- irf(svar_1, response = "srv", impulse = "media",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+```
+
+```{r, echo=FALSE, warning= F, fig.show="hold", out.width="50%"}
+par(mar = c(4, 4, .1, .1))
+plot(irf_1, main = "Единичный шок по статье расходы на средства массовой информации",
+     ylab = "Величина отклика tr")
+plot(irf_2, main = "Единичный шок по статье расходы на средства массовой информации",
+     ylab = "Величина отклика srv")
+```
+Эффект от единичного шока не значим.
+
+#### Модель 13  
+
+Спецификация модели 13:  
+$$\begin{bmatrix} \Delta sport_t \\ \Delta tr_t \\ \Delta srv_t \end{bmatrix} = 
+C + \sum_{i=1}^p A_i\begin{bmatrix} \Delta sport_{t-i} \\ \Delta tr_{t-i} \\ \Delta srv_{t-i} \end{bmatrix}
++ B * exog_t + \epsilon_t,$$  
+где переменная $sport$ - расходы на физическую культуру и спорт,  
+$p$ = 3  
+```{r, include = F, echo=F}
+data <- cbind(tr, srv, sport)
+# количество лагов 1
+info_var <- VARselect(y = data, lag.max = 15, type = "both")
+info_var$selection
+
+# оцениваем модель
+var_est1 <- VAR(data, p = 3, type = "both", season = NULL, exogen = dum)
+summary(var_est1)
+
+# A mat
+a.mat <- diag(3)
+diag(a.mat) <- NA
+a.mat[2, 1] <- NA
+a.mat[3, 1] <- NA
+a.mat[3, 2] <- NA
+print(a.mat)
+
+# B mat
+b.mat <- diag(3)
+diag(b.mat) <- NA
+print(b.mat)
+
+
+#SVAR model
+svar_1 <- SVAR(var_est1, 
+              Amat = a.mat, 
+              Bmat = b.mat, 
+              max.iter = 10000, 
+              hessian = TRUE)
+svar_1
+```
+
+```{r, echo=FALSE, warning=F}
+irf_1 <- irf(svar_1, response = "tr", impulse = "sport",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+
+irf_2 <- irf(svar_1, response = "srv", impulse = "sport",
+             n.ahead = 30,
+             ortho = TRUE,
+             boot = TRUE)
+```
+
+```{r, echo=FALSE, warning= F, fig.show="hold", out.width="50%"}
+par(mar = c(4, 4, .1, .1))
+plot(irf_1, main = "Единичный шок по статье расходы на физическую культуру и спорт",
+     ylab = "Величина отклика tr")
+plot(irf_2, main = "Единичный шок по статье расходы на физическую культуру и спорт",
+     ylab = "Величина отклика srv")
+```
+Эффект от единичного шока не значим.
